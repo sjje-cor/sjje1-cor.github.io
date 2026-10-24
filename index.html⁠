@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>撿手機文學：女友視角模式</title>
+    <style>
+        :root {
+            --primary-pink: #ffb7c5;
+            --soft-pink: #ffe4e9;
+            --accent-pink: #ff6b8b;
+            --bg-color: #f8f9fa;
+            --text-main: #2d3748;
+            --text-light: #718096;
+            --border-color: #e2e8f0;
+            --bubble-self: #ff6b8b;
+            --bubble-other: #edf2f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #1a202c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 手機外框容器 */
+        .phone-container {
+            width: 100%;
+            max-width: 414px;
+            height: 100vh;
+            max-height: 896px;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (min-width: 480px) {
+            .phone-container {
+                height: 844px;
+                border-radius: 40px;
+                border: 12px solid #2d3748;
+            }
+        }
+
+        /* 狀態列 */
+        .status-bar {
+            height: 44px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        /* 畫面層管理 */
+        .screen {
+            position: absolute;
+            top: 44px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 44px);
+            background: #ffffff;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* 1. 初始設定畫面 (Setup Screen) */
+        #setup-screen {
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe4e9 100%);
+            padding: 30px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .setup-card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(255, 107, 139, 0.15);
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .setup-card h2 {
+            color: var(--accent-pink);
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        .setup-card p {
+            color: var(--text-light);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--accent-pink);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-pink);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 107, 139, 0.3);
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* 2. 鎖定畫面 (Lock Screen) */
+        #lock-screen {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80') center/cover;
+            color: white;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .lock-time {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .lock-time h1 {
+            font-size: 64px;
+            font-weight: 300;
+            letter-spacing: -2px;
+        }
+
+        .lock-time p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .lock-notifications {
+            width: 100%;
+            max-width: 340px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 40px;
+        }
+
+        .lock-notif-item {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .lock-notif-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .unlock-btn {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 15px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        /* 3. 手機桌面 (Home Screen) */
+        #home-screen {
+            background: #f7fafc;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .widget-weather {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px 12px;
+            margin-bottom: 30px;
+        }
+
+        .app-icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .app-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+            position: relative;
+            transition: transform 0.15s;
+        }
+
+        .app-icon:active {
+            transform: scale(0.92);
+        }
+
+        .app-label {
+            font-size: 12px;
+            color: var(--text-main);
+            margin-top: 6px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ff3b30;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 2px solid white;
+        }
+
+        /* 共通 App 頂部列 */
+        .app-header {
+            height: 50px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            flex-shrink: 0;
+        }
+
+        .app-header h3 {
+            font-size: 16px;
+            color: var(--text-main);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 15px;
+            color: var(--accent-pink);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* 4. 粉絲社群 APP (FAN SPACE) */
+        #fan-space-screen {
+            background: #fdfdfd;
+        }
+
+        .fan-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+
+        .fan-tab {
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+
+        .fan-tab.active {
+            color: var(--accent-pink);
+            border-bottom-color: var(--accent-pink);
+        }
+
+        .fan-content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .fan-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+        }
+
+        .fan-info .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .fan-info .time {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .post-body {
+            font-size: 14px;
+            color: var(--text-main);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+            border-top: 1px solid #f7fafc;
+            padding-top: 8px;
+        }
+
+        .post-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+
+        .post-action-btn.liked {
+            color: var(--accent-pink);
+        }
+
+        /* 投票卡片 */
+        .poll-card {
+            background: #fff5f7;
+            border: 1px solid #fed7d7;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .poll-option {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .poll-option:hover {
+            border-color: var(--accent-pink);
+            background: #fffaf0;
+        }
+
+        /* 留言區模態視窗 / 頁面 */
+        .comment-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+        }
+
+        .comment-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .comment-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+
+        .comment-input-bar {
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background: white;
+        }
+
+        .comment-input-bar input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .comment-input-bar button {
+            background: var(--accent-pink);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* 5. LINE 聊天室 APP */
+        #line-screen {
+            background: #b2c7d9;
+        }
+
+        .chat-list {
+            flex: 1;
+            background: white;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f7fafc;
+            cursor: pointer;
+        }
+
+        .chat-item:hover {
+            background: #f8fafc;
+        }
+
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            margin-right: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .chat-lastmsg {
+            font-size: 13px;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .chat-room {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 50px);
+            background: #b2c7d9;
+            display: none;
+            flex-direction: column;
+            z-index: 50;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .message.other {
+            background: white;
+            color: var(--text-main);
+            align-self: flex-start;
+            border-top-left-radius: 4px;
+        }
+
+        .message.self {
+            background: #fee180;
+            color: var(--text-main);
+            align-self: flex-end;
+            border-top-right-radius: 4px;
+        }
+
+        .chat-input-area {
+            background: #f7f9fa;
+            padding: 10px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-top: 1px solid #e4e9ed;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #dcdcdc;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+            background: white;
+        }
+
+        .chat-input-area button {
+            background: #06c755;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 6. 其他 APP 通用視窗 */
+        .generic-app-screen {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 50px);
+            background: white;
+            display: none;
+            flex-direction: column;
+            z-index: 50;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .generic-app-screen h2 {
+            font-size: 18px;
+            margin-bottom: 14px;
+            color: var(--text-main);
+        }
+
+        .content-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        /* 導覽列返回主畫面按鈕 */
+        .home-bar {
+            height: 24px;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .home-bar::after {
+            content: '';
+            width: 120px;
+            height: 4px;
+            background: #cbd5e0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-container">
+    <!-- 頂部狀態列 -->
+    <div class="status-bar">
+        <span id="status-time">21:25</span>
+        <span>5G 🔋 98%</span>
+    </div>
+
+    <!-- 1. 初始設定畫面 (Setup Screen) -->
+    <div id="setup-screen" class="screen active">
+        <div class="setup-card">
+            <h2>《撿手機文學》</h2>
+            <p>女友視角模式 × 秘密戀情</p>
+            <div class="input-group">
+                <label>請輸入您的女朋友姓名：</label>
+                <input type="text" id="input-gf-name" placeholder="例如：夏雨晴" value="雨晴">
+            </div>
+            <div class="input-group">
+                <label>請選擇您的男朋友：</label>
+                <select id="select-boyfriend">
+                    <option value="蔡承祐">蔡承祐 (溫柔主動、細心)</option>
+                    <option value="吳昱廷">吳昱廷 (幽默風趣、才華洋溢)</option>
+                    <option value="高胥崴">高胥崴 (可靠穩重、責任感強)</option>
+                    <option value="高有翔">高有翔 (深情浪漫、深夜感性)</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="initGameSession()">開啟手機探索</button>
+        </div>
+    </div>
+
+    <!-- 2. 鎖定畫面 (Lock Screen) -->
+    <div id="lock-screen" class="screen">
+        <div class="lock-time">
+            <h1 id="lock-clock">21:25</h1>
+            <p>10月24日 星期六</p>
+        </div>
+        <div class="lock-notifications">
+            <div class="lock-notif-item"><strong>LINE：</strong> <span id="lock-notif-text">有一則來自男友的新訊息</span></div>
+        </div>
+        <button class="unlock-btn" onclick="goToHome()">滑動解鎖手機</button>
+    </div>
+
+    <!-- 3. 手機桌面 (Home Screen) -->
+    <div id="home-screen" class="screen">
+        <div class="widget-weather">
+            <div>
+                <h4 style="font-size: 16px; color: var(--text-main);" id="widget-greeting">早安，雨晴</h4>
+                <p style="font-size: 12px; color: var(--text-light);" id="widget-bf-status">男友目前狀態：工作中 💼</p>
+            </div>
+            <span style="font-size: 28px;">🌤️ 24°C</span>
+        </div>
+
+        <div class="app-grid">
+            <div class="app-icon-wrapper" onclick="openApp('line')">
+                <div class="app-icon" style="background: #06c755;">💬<span class="badge" id="line-badge">1</span></div>
+                <span class="app-label">LINE</span>
+            </div>
+            <div class="app-icon-wrapper" onclick="openApp('fan-space')">
+                <div class="app-icon" style="background: linear-gradient(135deg, #ff6b8b, #ff8e53);">🔥<span class="badge" id="fan-badge">3</span></div>
+                <span class="app-label">粉絲社群</span>
+            </div>
+            <div class="app-icon-wrapper" onclick="openApp('ig')">
+                <div class="app-icon" style="background: radial-gradient(circle at 30% 107%, #fdf497 0%, #df3474 55%, #7638fa 90%);">📸</div>
+                <span class="app-label">Instagram</span>
+            </div>
+            <div class="app-icon-wrapper" onclick="openApp('threads')">
+                <div class="app-icon" style="background: #000000;">🧵</div>
+                <span class="app-label">Threads</span>
+            </div>
+            <div class="app-icon-wrapper" onclick="openApp('gallery')">
+                <div class="app-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">🖼️</div>
+                <span class="app-label">相簿</span>
+            </div>
+            <div class="app-icon-wrapper" onclick="openApp('calendar')">
+                <div class="app-icon" style="background: #ff3b30;">📅</div>
+                <span class="app-label">行事曆</span>
+            </div>
+            <div class="app-icon-wrapper" onclick="openApp('notes')">
+                <div class="app-icon" style="background: #ffcc00;">📝</div>
+                <span class="app-label">備忘錄</span>
+            </div>
+            <div class="app-icon-wrapper" onclick="openApp('calls')">
+                <div class="app-icon" style="background: #34c759;">📞</div>
+                <span class="app-label">通話紀錄</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 粉絲社群 APP (FAN SPACE) -->
+    <div id="fan-space-screen" class="screen">
+        <div class="app-header">
+            <button class="back-btn" onclick="goToHome()">‹ 返回桌面</button>
+            <h3>FAN SPACE 粉絲社群</h3>
+            <button class="back-btn" onclick="openNewPostModal()">發文</button>
+        </div>
+        <div class="fan-tabs">
+            <div class="fan-tab active" onclick="switchFanTab(this, 'hot')">🔥 熱門話題</div>
+            <div class="fan-tab" onclick="switchFanTab(this, 'latest')">✨ 最新貼文</div>
+            <div class="fan-tab" onclick="switchFanTab(this, 'poll')">📊 粉絲投票</div>
+            <div class="fan-tab" onclick="switchFanTab(this, 'myposts')">👤 我的互動</div>
+        </div>
+        <div class="fan-content-area" id="fan-posts-container">
+            <!-- 動態渲染貼文 -->
+        </div>
+
+        <!-- 貼文留言視窗 -->
+        <div id="comment-modal" class="comment-modal">
+            <div class="app-header">
+                <button class="back-btn" onclick="closeCommentModal()">‹ 返回列表</button>
+                <h3>貼文留言區</h3>
+                <span></span>
+            </div>
+            <div class="comment-list" id="comment-list-container">
+                <!-- 留言列表 -->
+            </div>
+            <div class="comment-input-bar">
+                <input type="text" id="comment-input" placeholder="以女朋友或粉絲身分留言...">
+                <button onclick="submitComment()">發布</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. LINE 聊天室 APP -->
+    <div id="line-screen" class="screen">
+        <div class="app-header">
+            <button class="back-btn" onclick="goToHome()">‹ 返回桌面</button>
+            <h3>LINE</h3>
+            <span>⚙️</span>
+        </div>
+        <div class="chat-list" id="line-chat-list">
+            <!-- 動態渲染聊天室清單 -->
+        </div>
+
+        <!-- LINE 私人聊天對話框 -->
+        <div id="line-chat-room" class="chat-room">
+            <div class="app-header">
+                <button class="back-btn" onclick="closeLineRoom()">‹ 返回聊天</button>
+                <h3 id="room-title">男友</h3>
+                <span>🔔</span>
+            </div>
+            <div class="chat-messages" id="room-messages">
+                <!-- 對話記錄 -->
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="line-input" placeholder="傳送訊息給男友...">
+                <button onclick="sendLineMessage()">傳送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. 其它基礎 APP 畫面 -->
+    <div id="ig-screen" class="screen">
+        <div class="app-header"><button class="back-btn" onclick="goToHome()">‹ 返回</button><h3>Instagram</h3><span></span></div>
+        <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+            <h2>📸 公開貼文與限時動態</h2>
+            <div class="content-box"><strong>@c_you_03</strong> 今天天氣不錯，出來走走。 <br><span style="font-size:12px; color:gray;">❤️ 1,420 個讚 · 粉絲熱議中</span></div>
+            <div class="content-box"><strong>@w_yuting_</strong> 新曲創作中，靈感滿點。 <br><span style="font-size:12px; color:gray;">❤️ 2,105 個讚</span></div>
+        </div>
+    </div>
+
+    <div id="threads-screen" class="screen">
+        <div class="app-header"><button class="back-btn" onclick="goToHome()">‹ 返回</button><h3>Threads</h3><span></span></div>
+        <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+            <h2>🧵 日常碎念</h2>
+            <div class="content-box"><strong>男友每日碎念：</strong>「忙完肚子好餓，不知道某人有沒有乖乖吃飯...」<br><span style="font-size:12px; color:gray;">💬 粉絲猜測紛紛：是在說誰？</span></div>
+        </div>
+    </div>
+
+    <div id="gallery-screen" class="screen">
+        <div class="app-header"><button class="back-btn" onclick="goToHome()">‹ 返回</button><h3>相簿</h3><span></span></div>
+        <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+            <h2>🖼️ 共同回憶與私房照片</h2>
+            <div class="content-box">📁 私密相簿（僅限兩人解鎖）<br>• 週末約會咖啡廳合照<br>• 深夜散步影子照</div>
+        </div>
+    </div>
+
+    <div id="calendar-screen" class="screen">
+        <div class="app-header"><button class="back-btn" onclick="goToHome()">‹ 返回</button><h3>行事曆</h3><span></span></div>
+        <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+            <h2>📅 行程與約會記錄</h2>
+            <div class="content-box"><strong>10/26 (一) 19:00</strong> - 祕密晚餐約會 (老地方見)</div>
+        </div>
+    </div>
+
+    <div id="notes-screen" class="screen">
+        <div class="app-header"><button class="back-btn" onclick="goToHome()">‹ 返回</button><h3>備忘錄</h3><span></span></div>
+        <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+            <h2>📝 男友的貼心備忘</h2>
+            <div class="content-box">• 雨晴喜歡喝微糖芋頭拿鐵<br>• 紀念日：5月20日<br>• 記得提醒她早點睡覺</div>
+        </div>
+    </div>
+
+    <div id="calls-screen" class="screen">
+        <div class="app-header"><button class="back-btn" onclick="goToHome()">‹ 返回</button><h3>通話紀錄</h3><span></span></div>
+        <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+            <h2>📞 最近通話</h2>
+            <div class="content-box">🟢 語音通話 (昨天 23:45) - 通話時間 42分鐘<br>🟢 語音通話 (3天前) - 通話時間 15分鐘</div>
+        </div>
+    </div>
+
+    <!-- 底部返回主畫面指示條 -->
+    <div class="home-bar" onclick="goToHome()"></div>
+</div>
+
+<script>
+    /* 遊戲核心狀態管理 */
+    let gameState = {
+        gfName: "雨晴",
+        boyfriend: "蔡承祐",
+        initialized: false,
+        currentPostId: null,
+        fanPosts: [
+            { id: 1, author: "追星小達人", avatar: "追", time: "10分鐘前", text: "大家有看到蔡承祐今天限動背景那杯飲料嗎？好像跟上次某個網紅拍的一樣欸！", likes: 34, comments: 5, liked: false, category: "hot" },
+            { id: 2, author: "理性吃瓜群眾", avatar: "理", time: "1小時前", text: "拜託大家不要過度解讀藝人私生活好嗎，人家只是正常放假出門喝咖啡而已。", likes: 89, comments: 12, liked: false, category: "hot" },
+            { id: 3, author: "UNUS_Love", avatar: "U", time: "3小時前", text: "今天高胥崴的 Threads 到底是在暗示什麼啦？看得我好心急 😭", likes: 120, comments: 8, liked: false, category: "latest" }
+        ],
+        commentsData: {
+            1: [
+                { id: 101, author: "小花", text: "真假？！哪一家店？" },
+                { id: 102, author: "偵探系粉絲", text: "我放大看了杯套，好像是信義區那間..." }
+            ],
+            2: [
+                { id: 201, author: "路人甲", text: "推理性發言，給偶像一點私人空間吧！" }
+            ],
+            3: [
+                { id: 301, author: "宇廷控", text: "哈哈哈哈真的，笑死" }
+            ]
+        },
+        lineMessages: {
+            "boyfriend": [
+                { sender: "other", text: "寶貝，今天我有乖乖照三餐吃飯喔！妳呢？" },
+                { sender: "other", text: "好想妳，等下忙完打給妳好不好？" }
+            ],
+            "group": [
+                { sender: "other", text: "昱廷：明天集合時間不要遲到啊！" },
+                { sender: "other", text: "胥崴：收到，我會準時。" }
+            ]
+        }
+    };
+
+    /* 初始化與存檔載入 */
+    window.onload = function() {
+        const saved = localStorage.getItem('unus_gf_gamestate');
+        if (saved) {
+            try {
+                gameState = JSON.parse(saved);
+                document.getElementById('input-gf-name').value = gameState.gfName;
+                document.getElementById('select-boyfriend').value = gameState.boyfriend;
+                if (gameState.initialized) {
+                    goToHome();
+                }
+            } catch(e) { console.error(e); }
+        }
+        updateUI();
+    };
+
+    function saveGameState() {
+        localStorage.setItem('unus_gf_gamestate', JSON.stringify(gameState));
+    }
+
+    function initGameSession() {
+        const nameInput = document.getElementById('input-gf-name').value.trim();
+        if (!nameInput) {
+            alert('請輸入您的女朋友姓名！');
+            return;
+        }
+        gameState.gfName = nameInput;
+        gameState.boyfriend = document.getElementById('select-boyfriend').value;
+        gameState.initialized = true;
+        saveGameState();
+        updateUI();
+        goToHome();
+    }
+
+    function updateUI() {
+        document.getElementById('widget-greeting').innerText = `哈囉，${gameState.gfName}`;
+        document.getElementById('widget-bf-status').innerText = `男友 (${gameState.boyfriend})：想妳中 ❤️`;
+        renderFanPosts();
+        renderLineChats();
+    }
+
+    /* 畫面導航控制 */
+    function goToHome() {
+        if (!gameState.initialized) {
+            switchScreen('setup-screen');
+            return;
+        }
+        switchScreen('home-screen');
+    }
+
+    function openApp(appName) {
+        switch(appName) {
+            case 'line': switchScreen('line-screen'); break;
+            case 'fan-space': switchScreen('fan-space-screen'); break;
+            case 'ig': switchScreen('ig-screen'); break;
+            case 'threads': switchScreen('threads-screen'); break;
+            case 'gallery': switchScreen('gallery-screen'); break;
+            case 'calendar': switchScreen('calendar-screen'); break;
+            case 'notes': switchScreen('notes-screen'); break;
+            case 'calls': switchScreen('calls-screen'); break;
+        }
+    }
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    /* 粉絲社群互動邏輯 */
+    function renderFanPosts(category = 'hot') {
+        const container = document.getElementById('fan-posts-container');
+        container.innerHTML = '';
+
+        // 插入互動投票範例卡片
+        if (category === 'hot' || category === 'poll') {
+            container.innerHTML += `
+                <div class="poll-card">
+                    <h4 style="font-size: 14px; margin-bottom: 8px; color: var(--text-main);">📊 【今日互動話題】你最喜歡成員的哪種日常？</h4>
+                    <div class="poll-option" onclick="votePoll(this)">A. 深夜感性碎念 (42%)</div>
+                    <div class="poll-option" onclick="votePoll(this)">B. 認真工作日常 (35%)</div>
+                    <div class="poll-option" onclick="votePoll(this)">C. 與成員互相吐槽 (23%)</div>
+                </div>
+            `;
+        }
+
+        const filtered = gameState.fanPosts.filter(p => category === 'hot' ? p.category === 'hot' : true);
+        filtered.forEach(post => {
+            container.innerHTML += `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="fan-avatar">${post.avatar}</div>
+                        <div class="fan-info">
+                            <div class="name">${post.author}</div>
+                            <div class="time">${post.time}</div>
+                        </div>
+                    </div>
+                    <div class="post-body">${post.text}</div>
+                    <div class="post-footer">
+                        <button class="post-action-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                            ❤️ ${post.likes}
+                        </button>
+                        <button class="post-action-btn" onclick="openComments(${post.id})">
+                            💬 ${post.comments} 留言
+                        </button>
+                        <span>分享</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function switchFanTab(el, category) {
+        document.querySelectorAll('.fan-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        renderFanPosts(category);
+    }
+
+    function toggleLike(postId) {
+        const post = gameState.fanPosts.find(p => p.id === postId);
+        if (post) {
+            post.liked = !post.liked;
+            post.likes += post.liked ? 1 : -1;
+            saveGameState();
+            renderFanPosts();
+        }
+    }
+
+    function votePoll(el) {
+        alert('投票成功！感謝您的參與 🎉');
+        el.style.background = '#ffe4e9';
+        el.style.borderColor = 'var(--accent-pink)';
+    }
+
+    function openComments(postId) {
+        gameState.currentPostId = postId;
+        const listContainer = document.getElementById('comment-list-container');
+        listContainer.innerHTML = '';
+        
+        const comments = gameState.commentsData[postId] || [];
+        if (comments.length === 0) {
+            listContainer.innerHTML = `<p style="text-align:center; color:gray; padding:20px;">尚無留言，趕快留下第一則評論吧！</p>`;
+        } else {
+            comments.forEach(c => {
+                listContainer.innerHTML += `
+                    <div class="comment-item">
+                        <strong>${c.author}：</strong> ${c.text}
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('comment-modal').style.display = 'flex';
+    }
+
+    function closeCommentModal() {
+        document.getElementById('comment-modal').style.display = 'none';
+    }
+
+    function submitComment() {
+        const input = document.getElementById('comment-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        if (!gameState.commentsData[gameState.currentPostId]) {
+            gameState.commentsData[gameState.currentPostId] = [];
+        }
+
+        gameState.commentsData[gameState.currentPostId].push({
+            id: Date.now(),
+            author: `${gameState.gfName} (女友視角)`,
+            text: text
+        });
+
+        // 更新貼文留言數
+        const post = gameState.fanPosts.find(p => p.id === gameState.currentPostId);
+        if (post) post.comments++;
+
+        saveGameState();
+        input.value = '';
+        openComments(gameState.currentPostId);
+        renderFanPosts();
+    }
+
+    function openNewPostModal() {
+        const text = prompt("發布新的粉絲社群討論：");
+        if (text) {
+            gameState.fanPosts.unshift({
+                id: Date.now(),
+                author: `${gameState.gfName} (粉絲帳號)`,
+                avatar: gameState.gfName[0],
+                time: "剛剛",
+                text: text,
+                likes: 1,
+                comments: 0,
+                liked: true,
+                category: "latest"
+            });
+            saveGameState();
+            renderFanPosts('latest');
+        }
+    }
+
+    /* LINE 聊天室邏輯 */
+    function renderLineChats() {
+        const list = document.getElementById('line-chat-list');
+        list.innerHTML = `
+            <div class="chat-item" onclick="openLineRoom('boyfriend', '${gameState.boyfriend}')">
+                <div class="chat-avatar" style="background:var(--accent-pink);">${gameState.boyfriend[0]}</div>
+                <div class="chat-info">
+                    <div class="chat-name">${gameState.boyfriend} ❤️</div>
+                    <div class="chat-lastmsg">寶貝，今天我有乖乖照三餐吃飯喔！</div>
+                </div>
+            </div>
+            <div class="chat-item" onclick="openLineRoom('group', 'UNUS 秘密日常群組')">
+                <div class="chat-avatar" style="background:#4299e1;">👥</div>
+                <div class="chat-info">
+                    <div class="chat-name">UNUS 日常聊天群</div>
+                    <div class="chat-lastmsg">昱廷：明天集合時間不要遲到啊！</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function openLineRoom(type, title) {
+        document.getElementById('room-title').innerText = title;
+        const msgContainer = document.getElementById('room-messages');
+        msgContainer.innerHTML = '';
+
+        const msgs = gameState.lineMessages[type] || [];
+        msgs.forEach(m => {
+            msgContainer.innerHTML += `<div class="message ${m.sender}">${m.text}</div>`;
+        });
+
+        document.getElementById('line-chat-room').style.display = 'flex';
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+
+    function closeLineRoom() {
+        document.getElementById('line-chat-room').style.display = 'none';
+    }
+
+    function sendLineMessage() {
+        const input = document.getElementById('line-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const msgContainer = document.getElementById('room-messages');
+        msgContainer.innerHTML += `<div class="message self">${text}</div>`;
+        input.value = '';
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+
+        // 模擬男友自動回覆
+        setTimeout(() => {
+            let replyText = "收到囉！等下忙完馬上找妳 💖";
+            if (text.includes("想") || text.includes("愛")) {
+                replyText = "我也好想妳，乖～等我！";
+            } else if (text.includes("在哪") || text.includes("幹嘛")) {
+                replyText = "在想妳啊，怎麼了？";
+            }
+            msgContainer.innerHTML += `<div class="message other">${replyText}</div>`;
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+        }, 1200);
+    }
+</script>
+
+</body>
+</html>
