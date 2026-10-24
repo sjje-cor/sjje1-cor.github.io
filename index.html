@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <title>撿手機文學：女友視角模式</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="phone-container">
+    <div class="status-bar">
+      <span id="status-time">21:25</span>
+      <span>5G 🔋 98%</span>
+    </div>
+
+    <div id="setup-screen" class="screen active">
+      <div class="setup-card">
+        <h2>《撿手機文學》</h2>
+        <p>女友視角模式 × 秘密戀情</p>
+
+        <div class="input-group">
+          <label>請輸入您的女朋友姓名：</label>
+          <input type="text" id="input-gf-name" value="雨晴" placeholder="例如：夏雨晴" />
+        </div>
+
+        <div class="input-group">
+          <label>請選擇您的男朋友：</label>
+          <select id="select-boyfriend">
+            <option value="蔡承祐">蔡承祐 (溫柔主動、細心)</option>
+            <option value="吳昱廷">吳昱廷 (幽默風趣、才華洋溢)</option>
+            <option value="高胥崴">高胥崴 (可靠穩重、責任感強)</option>
+            <option value="高有翔">高有翔 (深情浪漫、深夜感性)</option>
+          </select>
+        </div>
+
+        <button class="btn-primary" onclick="initGameSession()">開啟手機探索</button>
+      </div>
+    </div>
+
+    <div id="lock-screen" class="screen">
+      <div class="lock-time">
+        <h1 id="lock-clock">21:25</h1>
+        <p id="lock-date">10月24日 星期六</p>
+      </div>
+
+      <div class="lock-notifications">
+        <div class="lock-notif-item">
+          <strong>LINE：</strong>
+          <span id="lock-notif-text">有一則來自男友的新訊息</span>
+        </div>
+      </div>
+
+      <button class="unlock-btn" onclick="goToHome()">滑動解鎖手機</button>
+    </div>
+
+    <div id="home-screen" class="screen">
+      <div class="widget-weather">
+        <div>
+          <h4 id="widget-greeting" style="font-size:16px; color:var(--text-main);">哈囉，雨晴</h4>
+          <p id="widget-bf-status" style="font-size:12px; color:var(--text-light);">男友目前狀態：想妳中 ❤️</p>
+        </div>
+        <span style="font-size:28px;">🌤️ 24°C</span>
+      </div>
+
+      <div class="app-grid">
+        <div class="app-icon-wrapper" onclick="openApp('line')">
+          <div class="app-icon" style="background:#06c755;">
+            💬
+            <span class="badge" id="line-badge">1</span>
+          </div>
+          <span class="app-label">LINE</span>
+        </div>
+
+        <div class="app-icon-wrapper" onclick="openApp('fan-space')">
+          <div class="app-icon" style="background:linear-gradient(135deg,#ff6b8b,#ff8e53);">
+            🔥
+            <span class="badge" id="fan-badge">3</span>
+          </div>
+          <span class="app-label">粉絲社群</span>
+        </div>
+
+        <div class="app-icon-wrapper" onclick="openApp('ig')">
+          <div class="app-icon" style="background:radial-gradient(circle at 30% 107%, #fdf497 0%, #df3474 55%, #7638fa 90%);">📸</div>
+          <span class="app-label">Instagram</span>
+        </div>
+
+        <div class="app-icon-wrapper" onclick="openApp('threads')">
+          <div class="app-icon" style="background:#000000;">🧵</div>
+          <span class="app-label">Threads</span>
+        </div>
+
+        <div class="app-icon-wrapper" onclick="openApp('gallery')">
+          <div class="app-icon" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">🖼️</div>
+          <span class="app-label">相簿</span>
+        </div>
+
+        <div class="app-icon-wrapper" onclick="openApp('calendar')">
+          <div class="app-icon" style="background:#ff3b30;">📅</div>
+          <span class="app-label">行事曆</span>
+        </div>
+
+        <div class="app-icon-wrapper" onclick="openApp('notes')">
+          <div class="app-icon" style="background:#ffcc00;">📝</div>
+          <span class="app-label">備忘錄</span>
+        </div>
+
+        <div class="app-icon-wrapper" onclick="openApp('calls')">
+          <div class="app-icon" style="background:#34c759;">📞</div>
+          <span class="app-label">通話紀錄</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="fan-space-screen" class="screen">
+      <div class="app-header">
+        <button class="back-btn" onclick="goToHome()">‹ 返回桌面</button>
+        <h3>FAN SPACE 粉絲社群</h3>
+        <button class="back-btn" onclick="openNewPostModal()">發文</button>
+      </div>
+
+      <div class="fan-tabs">
+        <div class="fan-tab active" onclick="switchFanTab(this, 'hot')">🔥 熱門話題</div>
+        <div class="fan-tab" onclick="switchFanTab(this, 'latest')">✨ 最新貼文</div>
+        <div class="fan-tab" onclick="switchFanTab(this, 'poll')">📊 粉絲投票</div>
+        <div class="fan-tab" onclick="switchFanTab(this, 'myposts')">👤 我的互動</div>
+      </div>
+
+      <div class="fan-content-area" id="fan-posts-container"></div>
+
+      <div id="comment-modal" class="comment-modal">
+        <div class="app-header">
+          <button class="back-btn" onclick="closeCommentModal()">‹ 返回列表</button>
+          <h3>貼文留言區</h3>
+          <span></span>
+        </div>
+        <div class="comment-list" id="comment-list-container"></div>
+        <div class="comment-input-bar">
+          <input type="text" id="comment-input" placeholder="以女朋友或粉絲身分留言..." />
+          <button onclick="submitComment()">發布</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="line-screen" class="screen">
+      <div class="app-header">
+        <button class="back-btn" onclick="goToHome()">‹ 返回桌面</button>
+        <h3>LINE</h3>
+        <span>⚙️</span>
+      </div>
+
+      <div class="chat-list" id="line-chat-list"></div>
+
+      <div id="line-chat-room" class="chat-room">
+        <div class="app-header">
+          <button class="back-btn" onclick="closeLineRoom()">‹ 返回聊天</button>
+          <h3 id="room-title">男友</h3>
+          <span>🔔</span>
+        </div>
+
+        <div class="chat-messages" id="room-messages"></div>
+
+        <div class="chat-input-area">
+          <input type="text" id="line-input" placeholder="傳送訊息給男友..." />
+          <button onclick="sendLineMessage()">傳送</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="ig-screen" class="screen">
+      <div class="app-header">
+        <button class="back-btn" onclick="goToHome()">‹ 返回</button>
+        <h3>Instagram</h3>
+        <span></span>
+      </div>
+      <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+        <h2>📸 公開貼文與限時動態</h2>
+        <div class="content-box">
+          <strong>@c_you_03</strong> 今天天氣不錯，出來走走。<br>
+          <span style="font-size:12px; color:gray;">❤️ 1,420 個讚 · 粉絲熱議中</span>
+        </div>
+        <div class="content-box">
+          <strong>@w_yuting_</strong> 新曲創作中，靈感滿點。<br>
+          <span style="font-size:12px; color:gray;">❤️ 2,105 個讚</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="threads-screen" class="screen">
+      <div class="app-header">
+        <button class="back-btn" onclick="goToHome()">‹ 返回</button>
+        <h3>Threads</h3>
+        <span></span>
+      </div>
+      <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+        <h2>🧵 日常碎念</h2>
+        <div class="content-box">
+          <strong>男友每日碎念：</strong>「忙完肚子好餓，不知道某人有沒有乖乖吃飯...」<br>
+          <span style="font-size:12px; color:gray;">💬 粉絲猜測紛紛：是在說誰？</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="gallery-screen" class="screen">
+      <div class="app-header">
+        <button class="back-btn" onclick="goToHome()">‹ 返回</button>
+        <h3>相簿</h3>
+        <span></span>
+      </div>
+      <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+        <h2>🖼️ 共同回憶與私房照片</h2>
+        <div class="content-box">
+          📁 私密相簿（僅限兩人解鎖）<br>
+          • 週末約會咖啡廳合照<br>
+          • 深夜散步影子照
+        </div>
+      </div>
+    </div>
+
+    <div id="calendar-screen" class="screen">
+      <div class="app-header">
+        <button class="back-btn" onclick="goToHome()">‹ 返回</button>
+        <h3>行事曆</h3>
+        <span></span>
+      </div>
+      <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+        <h2>📅 行程與約會記錄</h2>
+        <div class="content-box">
+          <strong>10/26 (一) 19:00</strong> - 祕密晚餐約會 (老地方見)
+        </div>
+      </div>
+    </div>
+
+    <div id="notes-screen" class="screen">
+      <div class="app-header">
+        <button class="back-btn" onclick="goToHome()">‹ 返回</button>
+        <h3>備忘錄</h3>
+        <span></span>
+      </div>
+      <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+        <h2>📝 男友的貼心備忘</h2>
+        <div class="content-box">
+          • 雨晴喜歡喝微糖芋頭拿鐵<br>
+          • 紀念日：5月20日<br>
+          • 記得提醒她早點睡覺
+        </div>
+      </div>
+    </div>
+
+    <div id="calls-screen" class="screen">
+      <div class="app-header">
+        <button class="back-btn" onclick="goToHome()">‹ 返回</button>
+        <h3>通話紀錄</h3>
+        <span></span>
+      </div>
+      <div class="generic-app-screen" style="display:flex; position:static; height:auto;">
+        <h2>📞 最近通話</h2>
+        <div class="content-box">
+          🟢 語音通話 (昨天 23:45) - 通話時間 42分鐘<br>
+          🟢 語音通話 (3天前) - 通話時間 15分鐘
+        </div>
+      </div>
+    </div>
+
+    <div class="home-bar" onclick="goToHome()"></div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
